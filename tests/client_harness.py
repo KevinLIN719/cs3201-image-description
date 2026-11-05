@@ -53,25 +53,26 @@ def free_port():
     return port
 
 
-def start_server(port, workdir):
-    """Start the mock server; its output goes to a file we poll for READY."""
+def start_server(port, workdir, backend="mock", host="127.0.0.1", threads=2,
+                 ready_timeout=60):
+    """Start the server; its output goes to a file we poll for READY."""
     log_path = Path(workdir) / "server.log"
     log = open(log_path, "w", encoding="utf-8", errors="replace")
     proc = subprocess.Popen(
-        [PYTHON, "ImageDescriptionServer.py", "--backend", "mock",
-         "--host", "127.0.0.1", "--port", str(port)],
+        [PYTHON, "ImageDescriptionServer.py", "--backend", backend,
+         "--host", host, "--port", str(port), "--threads", str(threads)],
         cwd=str(REPO), stdin=subprocess.DEVNULL, stdout=log,
         stderr=subprocess.STDOUT)
     proc._log_path = log_path
     proc._log_handle = log
-    deadline = time.time() + 30
+    deadline = time.time() + ready_timeout
     while time.time() < deadline:
         if proc.poll() is not None:
             break
         text = log_path.read_text(encoding="utf-8", errors="replace")
         if "READY" in text:
             return proc
-        time.sleep(0.1)
+        time.sleep(0.2)
     proc.kill()
     raise AssertionError("server did not print READY: "
                          + log_path.read_text(encoding="utf-8", errors="replace"))
@@ -87,7 +88,7 @@ def stop_server(proc):
     proc._log_handle.close()
 
 
-def run_client(port, stdin_text, workdir, timeout=60):
+def run_client(port, stdin_text, workdir, timeout=60, host="127.0.0.1"):
     """Run the client with the given stdin text and return (returncode, output)."""
     name = "client-%d" % time.time_ns()
     in_path = Path(workdir) / (name + ".in")
@@ -96,7 +97,7 @@ def run_client(port, stdin_text, workdir, timeout=60):
     with open(in_path, "r", encoding="utf-8") as stdin, \
             open(out_path, "w", encoding="utf-8", errors="replace") as stdout:
         result = subprocess.run(
-            [PYTHON, "ImageDescriptionClient.py", "127.0.0.1", str(port)],
+            [PYTHON, "ImageDescriptionClient.py", host, str(port)],
             cwd=str(REPO), stdin=stdin, stdout=stdout,
             stderr=subprocess.STDOUT, timeout=timeout)
     return result.returncode, out_path.read_text(encoding="utf-8", errors="replace")
@@ -110,6 +111,16 @@ def assert_prefixed(text):
     for line in lines_of(text):
         assert line.startswith("client: ") or line.startswith("server: "), \
             "unexpected output line: " + repr(line)
+
+
+def with_workdir(test_body):
+    """Give the body a fresh workdir and free port but no server of its own."""
+    workdir = make_workdir()
+    port = free_port()
+    try:
+        test_body(port, workdir)
+    finally:
+        shutil.rmtree(workdir, ignore_errors=True)
 
 
 def with_server(test_body):
