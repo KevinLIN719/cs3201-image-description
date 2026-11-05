@@ -5,3 +5,5 @@ models/
 setup.log
 __pycache__/
 *.pyc
+scratch/
+.test-tmp/
