@@ -1,0 +1,31 @@
+Test image sources and licenses
+
+These three images are supplied for UPLOAD, DESCRIBE and DOWNLOAD tests.
+Each image retains its original license. The image bytes are unchanged;
+only the filenames were assigned for this assignment. No endorsement is implied.
+Image licenses do not change the separate licenses of the code or model.
+
+cat.jpg
+Original file: File:Kitten sleeping.jpg
+Credit: Pixabay (as credited by Wikimedia Commons)
+Source: https://commons.wikimedia.org/wiki/File:Kitten_sleeping.jpg
+License: CC0 1.0 Universal
+License link: https://creativecommons.org/publicdomain/zero/1.0/
+Changes: Image bytes unchanged; filename assigned for this assignment.
+
+flower.png
+Original file: File:Rosa flower.png
+Credit: SurendharKandasami
+Source: https://commons.wikimedia.org/wiki/File:Rosa_flower.png
+License: CC0
+License link: http://creativecommons.org/publicdomain/zero/1.0/deed.en
+Changes: Image bytes unchanged; filename assigned for this assignment.
+
+fruit_bowl.jpg
+Original file: File:Fruit bowl - Massachusetts.jpg
+Credit: Daderot
+Source: https://commons.wikimedia.org/wiki/File:Fruit_bowl_-_Massachusetts.jpg
+License: CC0
+License link: http://creativecommons.org/publicdomain/zero/1.0/deed.en
+Changes: Image bytes unchanged; filename assigned for this assignment.
+
