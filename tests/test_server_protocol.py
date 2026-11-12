@@ -1,7 +1,7 @@
 """Self-test for Part 1 of ImageDescriptionServer.py (板块 1 验收).
 
 Run:
-    D:\\CityU\\CS3201_OIDS\\.venv\\Scripts\\python.exe test_server_protocol.py
+    .venv\Scripts\python.exe tests\test_server_protocol.py
 
 Covers: header format, round trip on several sizes, EOF before a message
 (None), EOF in the middle of a message (ConnectionError), invalid headers,
@@ -12,10 +12,10 @@ import socket
 import sys
 import threading
 
-REPO = r"D:\CityU\CS3201_OIDS"
-sys.path.insert(0, REPO)
 
-import ImageDescriptionServer as srv
+from client_harness import load_program  # noqa: E402
+
+srv = load_program("ImageDescriptionServer", "ImageDescriptionServer")
 
 HEADER = srv.HEADER_SIZE
 MAXB = srv.MAX_MESSAGE_BYTES

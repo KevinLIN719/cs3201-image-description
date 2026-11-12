@@ -206,8 +206,7 @@ def t_download_existing_file_is_not_replaced():
 
 
 def t_upload_check_units():
-    sys.path.insert(0, str(harness.REPO))
-    import ImageDescriptionClient as client
+    client = harness.load_program("ImageDescriptionClient", "ImageDescriptionClient")
 
     cat = harness.REPO / "test_images" / "cat.jpg"
     data, filename = client.check_upload_file(cat)

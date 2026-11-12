@@ -19,6 +19,28 @@ REPO = Path(__file__).resolve().parent.parent
 PYTHON = sys.executable
 TEST_TMP = REPO / ".test-tmp"
 
+
+def find_program(prefix):
+    """Name of the program file, which may carry the student ids in its name."""
+    names = sorted(p.name for p in REPO.glob(prefix + "*.py") if p.is_file())
+    if not names:
+        raise FileNotFoundError("no %s*.py in %s" % (prefix, REPO))
+    return names[0]
+
+
+SERVER_SCRIPT = find_program("ImageDescriptionServer")
+CLIENT_SCRIPT = find_program("ImageDescriptionClient")
+
+
+def load_program(prefix, module_name):
+    """Import a program file by path, whatever its file name is."""
+    import importlib.util
+    path = REPO / find_program(prefix)
+    spec = importlib.util.spec_from_file_location(module_name, path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
 passed = 0
 failed = []
 
@@ -59,7 +81,7 @@ def start_server(port, workdir, backend="mock", host="127.0.0.1", threads=2,
     log_path = Path(workdir) / "server.log"
     log = open(log_path, "w", encoding="utf-8", errors="replace")
     proc = subprocess.Popen(
-        [PYTHON, "ImageDescriptionServer.py", "--backend", backend,
+        [PYTHON, SERVER_SCRIPT, "--backend", backend,
          "--host", host, "--port", str(port), "--threads", str(threads)],
         cwd=str(REPO), stdin=subprocess.DEVNULL, stdout=log,
         stderr=subprocess.STDOUT)
@@ -97,7 +119,7 @@ def run_client(port, stdin_text, workdir, timeout=60, host="127.0.0.1"):
     with open(in_path, "r", encoding="utf-8") as stdin, \
             open(out_path, "w", encoding="utf-8", errors="replace") as stdout:
         result = subprocess.run(
-            [PYTHON, "ImageDescriptionClient.py", host, str(port)],
+            [PYTHON, CLIENT_SCRIPT, host, str(port)],
             cwd=str(REPO), stdin=stdin, stdout=stdout,
             stderr=subprocess.STDOUT, timeout=timeout)
     return result.returncode, out_path.read_text(encoding="utf-8", errors="replace")
